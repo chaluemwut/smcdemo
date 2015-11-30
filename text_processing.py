@@ -4,16 +4,11 @@ Created on Nov 30, 2015
 @author: ubuntu
 '''
 
-class MyClass(object):
-    '''
-    classdocs
-    '''
-
-
-    def __init__(self, params):
-        '''
-        Constructor
-        '''
+class TextProcessing(object):
+    
+    @staticmethod
+    def process(text):
+        return len(text)
 
 class TextUtil(object):
     

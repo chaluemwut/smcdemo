@@ -3,7 +3,16 @@ feature_map = {}
 
 class FeatureMapping(object):
     
-    def mapping(self, feature_name, feaure_value):
+    @staticmethod
+    def mapping_other(feature_name, feature_value):
+        v = feature_map[feature_name][0]
+        if v == feature_value:
+            return 1
+        else:
+            return 2
+    
+    @staticmethod
+    def mapping(feature_name, feaure_value):
         return feature_map[feature_name][feaure_value]
 
 class FeatureList(object):
