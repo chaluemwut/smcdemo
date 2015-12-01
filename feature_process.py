@@ -21,6 +21,7 @@ class FeatureList(object):
                    '$.user.verified', '$.user.followers_count', '$.user.statuses_count',
                    '$.user.description', '$.user.friends_count', '$.user.location',
                    '$.user.geo_enabled']
+    
     facebook_lst = ['likes', 'share', 'comment']
 
     def __init__(self, socialmedia_type):

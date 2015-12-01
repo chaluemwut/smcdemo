@@ -119,30 +119,61 @@ class FacebookHarvest(BaseHarvest):
     def process(self, keyword_lst):
         BaseHarvest.process(self)
     
-class Harvest(TwitterHarvest, FacebookHarvest):
+class TwitterOnlyHarvest(BaseHarvest):
+    
+    def call_api_2(self, keyword):
+        api = tweepy.API(self.auth)
+        s = api.search(q=keyword)
+        feature_data = []
+        for tweet in s:
+            feature_data.append(tweet)
+        return feature_data
+    
+    def process(self, keyword_lst):
+        BaseHarvest.process(self, keyword_lst)
+        if len(keyword_lst) == 0:
+            key_word_lst = self.trends_harvest()
+        else:
+            key_word_lst = keyword_lst
+        result = []
+        for key_word in key_word_lst:
+            result.extend(self.call_api_2(key_word))
+        return result
+
+class Harvest(TwitterHarvest, FacebookHarvest, TwitterOnlyHarvest):
     
     def process(self):
         twitter_keyword = ['คชาชาต', 'ประวิตร', 'อุดมเดช', 'เพื่อไทย', 'คุณหญิงจารุวรรณ',
                            'ราชภักดิ์', 'สุเทพ', 'คสช.', 'กินข้าว', 'แฟน', 'รัสเซีย',
                            'ขอนแก่นโมเดล', 'กรีซ', 'อาจารย์', 'ไปเที่ยวกัน', 'StrongerPor‬']
-        result = TwitterHarvest.process(self, twitter_keyword)
-        for t_msg in result:
-            msg = t_msg[0]
+        
+#         result = TwitterHarvest.process(self, twitter_keyword)
+#         for t_msg in result:
+#             msg = t_msg[0]
+#             if msg not in set_msg:
+#                 set_tweet.append(t_msg)
+#             set_msg.add(msg)
+
+        result = TwitterOnlyHarvest.process(self, twitter_keyword)
+        for tweet in result:
+            msg = tweet.text
             if msg not in set_msg:
-                set_tweet.append(t_msg)
+                set_tweet.append(tweet)
             set_msg.add(msg)
+            
 
 class HarvestRunner(Thread):
     
     def run(self):
         print 'start process'
-        while len(set_tweet) < 100:
+        while len(set_tweet) < 150:
             print 'start harvest', len(set_tweet), ' set message ', len(set_msg)
             h = Harvest()
             h.process()
             time.sleep(40)
-        pickle.dump(set_tweet, open('data/harvest.data', 'wb'))
-        pickle.dump(set_msg, open('data/message.data', 'wb'))
+            print 'after ', len(set_tweet)
+        pickle.dump(set_tweet, open('data/harvest2.data', 'wb'))
+#         pickle.dump(set_msg, open('data/message.data', 'wb'))
         print 'end process'
 
 def print_message():
@@ -201,8 +232,8 @@ def create_training_data():
     print y_test
                     
 if __name__ == '__main__':
-    create_training_data()
+#     create_training_data()
 #     for key, value in cred_label.iteritems():
 #         print key
 #     print_message()
-#     HarvestRunner().start()
+    HarvestRunner().start()
